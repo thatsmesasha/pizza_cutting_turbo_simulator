@@ -30,14 +30,21 @@ and saves states to the files if specified.
 `stream.py` is the rendering part of the game, it takes states from the files and
 renders them on the screen.
 
+#### Help
+
 More description on the game rules and parameters:
 
 ```
 python3 game.py --help
+```
+
+Parameters of streaming:
+
+```
 python3 stream.py --help
 ```
 
-**`Example`**
+#### Example
 
 To play a game with a keyboard and a display:
 
@@ -47,7 +54,7 @@ To play a game with a keyboard and a display:
 python3 game.py --wasd --output="slices.txt" --name=test01
 ```
 
-Paste pizza configuration with the last newline, for example:
+Paste pizza configuration (check help for more description) with the last newline, for example:
 
 ```
 3 5 1 6
@@ -56,15 +63,13 @@ TMMMT
 TTTTT
 ```
 
-Now you can use WASD keys to move/increase and space bar for toggling slice mode.
+Now you can use WASD keys to move/increase and space bar for toggling slice mode. Press CTRL-C or q to exit.
 
 2) In the second terminal, run:
 
 ```
 python3 stream.py --refresh_delay=0.5 --name=test01
 ```
-
-#### Stream
 
 Sample output of the stream:
 
