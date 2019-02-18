@@ -53,10 +53,6 @@ class KeyInput:
 class Game:
 
     def __init__(self, args):
-        self.name = args.get('name', None)
-        if self.name and not os.path.exists(self.name):
-            os.makedirs(self.name)
-
         self.max_steps = args.get('max_steps')
         self.env = None
 
@@ -167,6 +163,10 @@ if __name__ == '__main__':
     game = Game(game_args)
 
     try:
+        # create folder for states
+        if name is not None and not os.path.exists(name):
+            os.makedirs(name)
+
         # get pizza config
         config_line = input('')
         r, c, l, h = [int(n) for n in config_line.split(' ')]
@@ -176,10 +176,6 @@ if __name__ == '__main__':
             pizza_lines.append(input(''))
 
         pizza_config = { 'pizza_lines': pizza_lines, 'r': r, 'c': c, 'l': l, 'h': h }
-
-        # create folder for states
-        if not os.path.exists(name):
-            os.makedirs(name)
 
         # init game
         env = game.init(pizza_config)
