@@ -41,12 +41,22 @@ python3 stream.py --help
 
 To play a game with a keyboard and a display:
 
-1) In the first terminal, run and input pizza configuration (check help for
-description), and then use wasd and spacebar keys:
+1) In the first terminal, run:
 
 ```
 python3 game.py --wasd --output="slices.txt" --name=test01
 ```
+
+Paste pizza configuration with the last newline, for example:
+
+```
+3 5 1 6
+TTTTT
+TMMMT
+TTTTT
+```
+
+Now you can use WASD keys to move/increase and space bar for toggling slice mode.
 
 2) In the second terminal, run:
 
@@ -54,7 +64,9 @@ python3 game.py --wasd --output="slices.txt" --name=test01
 python3 stream.py --refresh_delay=0.5 --name=test01
 ```
 
-#### Leaked Pictures
+#### Stream
+
+Sample output of the stream:
 
 ```
       _)                                    |    |   _)
