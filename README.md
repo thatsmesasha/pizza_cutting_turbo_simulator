@@ -2,7 +2,9 @@
 [![Generic badge](https://img.shields.io/badge/Python-3.6.3-green.svg)](https://shields.io/)
 
 **_EXPLORE_** different configurations and shapes of pizza
-**_IMMERSE_** yourself in the world of cutting a pizza for your friends
+
+**_IMMERSE_** yourself in the world of a Google engineer trying to cut a pizza for some friends
+
 **_ENGAGE_** with slices, increase them to form bigger ones and earn points
 
 This is a simulator made for a practice problem of Google Hash Code competition in 2019.
