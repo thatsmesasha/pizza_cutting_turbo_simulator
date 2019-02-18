@@ -45,7 +45,7 @@ To play a game with a keyboard and a display:
 description), and then use wasd and spacebar keys:
 
 ```
-python3 game.py --wasd --name=test01
+python3 game.py --wasd --output="slices.txt" --name=test01
 ```
 
 2) In the second terminal, run:

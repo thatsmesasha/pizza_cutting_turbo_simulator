@@ -61,16 +61,15 @@ class ServePizza:
                 self.c_scale*c0+2: self.c_scale*(c1+1)+1: self.c_scale*(c1-c0+1)-2, # left, right columns
                 ] = '+'
 
-
     def put_cursor_at(self, position):
         r,c = position
         self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '['
         self.pizza[self.r_scale*r+2,self.c_scale*c+5] = ']'
 
-    def get_from(self, state):
-        unique_ingredients = state['unique_ingredients']
-        ingredients_map = state['ingredients_map']
-        slices_map = state['slices_map']
+    def get_from(self, env):
+        unique_ingredients = env['information']['unique_ingredients']
+        ingredients_map = env['state']['ingredients_map']
+        slices_map = env['state']['slices_map']
 
         r,c = len(ingredients_map),len(ingredients_map[0])
         self.r, self.c = self.r_scale*r+2,self.c_scale*c+3
@@ -82,7 +81,7 @@ class ServePizza:
         self.cut(slices)
 
         # put cursor
-        self.put_cursor_at(state['cursor_position'])
+        self.put_cursor_at(env['state']['cursor_position'])
 
         for line in self.pizza:
             print('    {}'.format(''.join(line)))
@@ -128,14 +127,13 @@ class Stream:
 
 
         self.step = -1
-        self.last_state_path = os.path.join(self.name, 'ready_pizza_state.json')
-        self.score = 0
+        self.last_state_path = os.path.join(self.name, 'ready_pizza_env.json')
 
         self.display_legend = not args.get('disable_legend')
 
-    def next_state(self):
+    def next_env(self):
         step = self.step+1
-        state_path = os.path.join(self.name, '{}_state.json'.format(step))
+        state_path = os.path.join(self.name, '{}_env.json'.format(step))
 
         while not os.path.exists(state_path) and not os.path.exists(self.last_state_path):
             if self.refresh_delay > 0:
@@ -146,29 +144,29 @@ class Stream:
                 with open(state_path) as f:
                     if len(f.readlines()) != 0:
                         f.seek(0)
-                        state = json.load(f)
+                        env = json.load(f)
                         break
             self.step = step
-            return state
+            return env
 
         return None
 
-    def display_state_variables(self, state):
+    def display_information(self, env):
         print('\n'*self.padding)
         print(stream.hello)
-        print('  Rows:                             {}'.format(len(state['ingredients_map'])))
-        print('  Columns:                          {}'.format(len(state['ingredients_map'][0])))
-        print('  Min each ingredient per slice:    {}'.format(state['min_each_ingredient_per_slice']))
-        print('  Max ingredients per slice:        {}'.format(state['max_ingredients_per_slice']))
+        print('  Rows:                             {}'.format(len(env['state']['ingredients_map'])))
+        print('  Columns:                          {}'.format(len(env['state']['ingredients_map'][0])))
+        print('  Min each ingredient per slice:    {}'.format(env['state']['min_each_ingredient_per_slice']))
+        print('  Max ingredients per slice:        {}'.format(env['state']['max_ingredients_per_slice']))
         print('')
-        print('  Last action:                      {}'.format(state['action']))
-        print('  Last reward:                      {}'.format(state['reward']))
+        print('  Last action:                      {}'.format(env['information']['action']))
+        print('  Last reward:                      {}'.format(env['reward']))
         print('')
-        print('  Cursor position:                  ({},{})'.format(*state['cursor_position']))
-        print('  Slice mode:                       {}'.format('on' if state['slice_mode'] else 'off'))
+        print('  Cursor position:                  ({},{})'.format(*env['state']['cursor_position']))
+        print('  Slice mode:                       {}'.format('on' if env['state']['slice_mode'] else 'off'))
         print('')
-        print('  Step:                             {}'.format(self.step))
-        print('  Score:                            {}'.format(self.score))
+        print('  Step:                             {}'.format(env['information']['step']))
+        print('  Score:                            {}'.format(env['information']['score']))
         print('')
         print('')
 
@@ -176,13 +174,11 @@ class Stream:
     def run(self):
         serve_pizza = ServePizza()
         while True:
-            state = self.next_state()
-            if state is None: break
+            env = self.next_env()
+            if env is None: break
 
-            self.score += state['reward']
-
-            self.display_state_variables(state)
-            serve_pizza.get_from(state)
+            self.display_information(env)
+            serve_pizza.get_from(env)
             if self.display_legend: print(self.legend)
 
 
