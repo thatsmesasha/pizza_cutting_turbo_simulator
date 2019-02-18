@@ -1,4 +1,5 @@
 ## Pizza Cutting Turbo Simulator
+[![Generic badge](https://img.shields.io/badge/Python-3.6.3-green.svg)](https://shields.io/)
 
 **_EXPLORE_** different configurations and shapes of pizza
 **_IMMERSE_** yourself in the world of cutting a pizza for your friends
