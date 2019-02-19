@@ -54,7 +54,7 @@ To play a game with a keyboard and a display:
 python3 game.py --wasd --output="slices.txt" --name=test01
 ```
 
-Paste pizza configuration (check help for more description) with the last newline, for example:
+Input pizza configuration (check help for more description) with the last newline in the terminal, for example:
 
 ```
 3 5 1 6

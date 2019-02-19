@@ -94,22 +94,28 @@ class Game:
         return self.env
 
 if __name__ == '__main__':
+    pizza_config_line_description = \
+        '1 line containing the following natural numbers separated by single spaces:\n' + \
+        '   - R (1 <= R <= 1000) is the number of rows,\n' + \
+        '   - C (1 <= C <= 1000) is the number of columns,\n' + \
+        '   - L (1 <= L <= 1000) is the minimum number of each ingredient cells in a slice,\n' + \
+        '   - H (1 <= H <= 1000) is the maximum total number of cells of a slice\n'
+
+    pizza_lines_description = \
+        'R lines describing the rows of the pizza (one row after another). Each of\n' + \
+        '   these lines contains C characters describing the ingredients in the cells\n' + \
+        '   of the row (one cell after another). Each character is either "M" (for mushroom)\n' + \
+        '   or "T" (for tomato).\n'
+
+
     import argparse
     parser = argparse.ArgumentParser(description='Cutting pizza for my friends',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog= '\n' + \
         ' Expects input as follows:' + \
+        ' - ' + pizza_config_line_description + \
         '\n' + \
-        ' - 1 line containing the following natural numbers separated by single spaces:\n' + \
-        '   - R (1 <= R <= 1000) is the number of rows,\n' + \
-        '   - C (1 <= C <= 1000) is the number of columns,\n' + \
-        '   - L (1 <= L <= 1000) is the minimum number of each ingredient cells in a slice,\n' + \
-        '   - H (1 <= H <= 1000) is the maximum total number of cells of a slice\n' + \
-        '\n' + \
-        ' - R lines describing the rows of the pizza (one row after another). Each of\n' + \
-        '   these lines contains C characters describing the ingredients in the cells\n' + \
-        '   of the row (one cell after another). Each character is either "M" (for mushroom)\n' + \
-        '   or "T" (for tomato).\n' + \
+        ' - ' + pizza_lines_description + \
         '\n' + \
         ' For input type one of "right", "down", "left", "up" to move/increase in specific direction \n' + \
         ' and "toggle" for toggling slice mode. Input will be read line by line.\n' + \
@@ -147,17 +153,20 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--name', default=None, help='folder where the states will be saved')
-    parser.add_argument('--output', default=None, help='store output slices to a file')
+    parser.add_argument('--slices_path', default=None, help='store output slices to a file')
     parser.add_argument('--max_steps', type=int, default=100, help='maximum steps to do before quiting')
     parser.add_argument('--wasd', action='store_true', help='instead of passing "right", "down", "left", ' + \
-        '"up", "toggle" you can use wasd keys and spacebar for toggle; do not include newline')
+        '"up", "toggle" you can use wasd keys and spacebar for toggle; this will also print help messages')
     args = parser.parse_args()
 
     args_dict = args.__dict__
-    output_path = args_dict.get('output')
+    slices_path = args_dict.get('slices_path')
     wasd = args_dict.get('wasd')
     name = args_dict.get('name')
     max_steps = args_dict.get('max_steps')
+
+    if wasd is not None and name is None:
+        raise Exception('Parameter --name must be provided for WASD mode')
 
     game_args = { 'max_steps': max_steps }
     game = Game(game_args)
@@ -168,13 +177,33 @@ if __name__ == '__main__':
             os.makedirs(name)
 
         # get pizza config
+        if wasd:
+            print('Input {}'.format(pizza_config_line_description))
+            print('For example: 3 5 1 6')
+            print()
+            print('Your input:')
+
         config_line = input('')
+        print()
         r, c, l, h = [int(n) for n in config_line.split(' ')]
 
         pizza_lines = []
+        if wasd:
+            print()
+            print('Input:')
+            print(pizza_lines_description)
+            print('For example:')
+            print()
+            print('TTTTT')
+            print('TMMMT')
+            print('TTTTT')
+            print()
+            print('Your input:')
+
         for i in range(r):
             pizza_lines.append(input(''))
 
+        print()
         pizza_config = { 'pizza_lines': pizza_lines, 'r': r, 'c': c, 'l': l, 'h': h }
 
         # init game
@@ -183,6 +212,13 @@ if __name__ == '__main__':
             env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
             with open(env_filename, 'w') as f:
                 json.dump(env, f, separators=(',',':'))
+
+        if wasd:
+            print('To get the display of the game, run in another terminal in the same directory:')
+            print('  python3 stream.py --refresh_delay=0.5 --name={}'.format(name))
+            print()
+            print('Now you can use WASD keys to move/increase and space bar for toggling slice mode. Press CTRL-C or q to exit.')
+            print()
 
         # run game
         action_input = KeyInput() if wasd else StandardInput()
@@ -208,8 +244,8 @@ if __name__ == '__main__':
                     json.dump(game.env, f, separators=(',',':'))
 
             # save slices
-            if output_path:
-                with open(output_path, 'w') as f:
+            if slices_path:
+                with open(slices_path, 'w') as f:
                     slices = game.env['information']['slices']
                     f.write('{}\n'.format(len(slices)))
                     for slice in slices:
