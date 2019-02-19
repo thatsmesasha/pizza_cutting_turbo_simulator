@@ -107,11 +107,24 @@ if __name__ == '__main__':
         '   of the row (one cell after another). Each character is either "M" (for mushroom)\n' + \
         '   or "T" (for tomato).\n'
 
+    game_rules = \
+        '   You can move around the pizza map and increase slices (input structure is below).\n' + \
+        '   The goal is to have maximum score obtaining the maximum amount of ingredients\n' + \
+        '   inside valid slices. A valid slice is a slice which satisfies provided slice constraints\n' + \
+        '   of having at least the specified minimum of each ingredient per slice and having not more\n' + \
+        '   than the maximum of all ingredients per slice.\n' + \
+        '   To increase slice, you need to toggle slice mode from OFF to ON. Then any direction that\n' + \
+        '   you will pass, will be applied to increase the slice at the cursor position.\n' + \
+        '   To disable slice mode, you need to toggle it one more time.\n' + \
+        '   Some actions will not change anything and you will not receive any reward for it.\n'
+
 
     import argparse
     parser = argparse.ArgumentParser(description='Cutting pizza for my friends',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog= '\n' + \
+        ' Game rules:\n' + \
+        game_rules + \
         ' Expects input as follows:' + \
         ' - ' + pizza_config_line_description + \
         '\n' + \
@@ -122,7 +135,7 @@ if __name__ == '__main__':
         ' You can overwrite how you pass the input with parameter --wasd (check its help).\n' + \
         ' When the slice mode is on, passing directions actions will increase the slice\n' + \
         ' at the position of the cursor. Otherwise, the cursor will move in the specified\n' + \
-        ' direction. Some moves will not do anything and you will receive the reward equal 0.\n' + \
+        ' direction.\n' + \
         '\n' + \
         ' Before each action there will be a file "<name>/<step_index>_env.json"\n' + \
         ' containing state, reward, game over and other information. If <name> parameter\n' + \
@@ -170,6 +183,25 @@ if __name__ == '__main__':
 
     game_args = { 'max_steps': max_steps }
     game = Game(game_args)
+
+    if wasd:
+        hello = '\n' + \
+            '        _)                                    |    |   _)                               \n' + \
+            '  __ \   | _  / _  /   _` |       __|  |   |  __|  __|  |  __ \    _` |                 \n' + \
+            '  |   |  |   /    /   (   |      (     |   |  |    |    |  |   |  (   |                 \n' + \
+            '  .__/  _| ___| ___| \__,_|     \___| \__,_| \__| \__| _| _|  _| \__, |                 \n' + \
+            ' _|                                                              |___/                  \n' + \
+            '\n' + \
+            '\n' + \
+            '         Welcome, I cut a pizza here for my friends!\n' + \
+            '\n' + \
+            '             76 69 76 65  6C 61  70 69 7A 7A 61 \n' + \
+            '\n' + \
+            '\n'
+        print(hello)
+        print('\n Game rules:\n')
+        print(game_rules)
+        print()
 
     try:
         # create folder for states
@@ -225,6 +257,7 @@ if __name__ == '__main__':
         while not env['done']:
             # get action
             action = action_input.next()
+            if wasd: print('Action: {}'.format(action))
             env = game.step(action)
             if name is not None:
                 env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
@@ -250,3 +283,5 @@ if __name__ == '__main__':
                     f.write('{}\n'.format(len(slices)))
                     for slice in slices:
                         f.write('{} {} {} {}\n'.format(*slice))
+
+        if wasd: print('\nBon appetit !')
