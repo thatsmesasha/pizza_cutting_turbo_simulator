@@ -24,11 +24,8 @@ cd pizza_cutting_turbo_simulator
 pip3 install -r requirements.txt
 ```
 
-`game.py` is the main game file that reads lines from standard input or keypresses
-and saves states to the files if specified.
-
-`stream.py` is the rendering part of the game, it takes states from the files and
-renders them on the screen.
+`game.py` is the main game file that reads lines from standard input or keypresses,
+renders the game and saves states to the files if specified.
 
 #### Help
 
@@ -38,57 +35,32 @@ More description on the game rules and parameters:
 python3 game.py --help
 ```
 
-Parameters of streaming:
-
-```
-python3 stream.py --help
-```
-
 #### Example
 
-To play a game with a keyboard and a display:
-
-1) In the first terminal, run:
+To play a game with a keyboard, run in a terminal:
 
 ```
-python3 game.py --wasd --output="slices.txt" --name=test01
-```
-
-Input pizza configuration (check help for more description) with the last newline in the terminal, for example:
-
-```
-3 5 1 6
-TTTTT
-TMMMT
-TTTTT
-```
-
-Now you can use WASD keys to move/increase and space bar for toggling slice mode. Press CTRL-C or q to exit.
-
-2) In the second terminal, run:
-
-```
-python3 stream.py --refresh_delay=0.5 --name=test01
+python3 game.py --wasd --render
 ```
 
 Sample output of the stream:
 
 ```
-      _)                                    |    |   _)
-__ \   | _  / _  /   _` |       __|  |   |  __|  __|  |  __ \    _` |
-|   |  |   /    /   (   |      (     |   |  |    |    |  |   |  (   |
-.__/  _| ___| ___| \__,_|     \___| \__,_| \__| \__| _| _|  _| \__, |
-_|                                                              |___/
-        | _)                         |                                _)
-        |  | \ \   /  _ \       __|  __|   __|  _ \   _` |  __ `__ \   |  __ \    _` |
-        |  |  \ \ /   __/     \__ \  |    |     __/  (   |  |   |   |  |  |   |  (   |
-       _| _|   \_/  \___|     ____/ \__| _|   \___| \__,_| _|  _|  _| _| _|  _| \__, |
-                                                                                 |___/
+             _)                                    |    |   _)
+       __ \   | _  / _  /   _` |       __|  |   |  __|  __|  |  __ \    _` |
+       |   |  |   /    /   (   |      (     |   |  |    |    |  |   |  (   |
+       .__/  _| ___| ___| \__,_|     \___| \__,_| \__| \__| _| _|  _| \__, |
+       _|                                                              |___/
+
+  |                 |                      _)                    |         |
+   __|  |   |   __|  __ \    _ \        __|  |  __ `__ \   |   |  |   _` |  __|   _ \    __|
+   |    |   |  |     |   |  (   |     \__ \  |  |   |   |  |   |  |  (   |  |    (   |  |
+  \__| \__,_| _|    _.__/  \___/      ____/ _| _|  _|  _| \__,_| _| \__,_| \__| \___/  _|
 
 
-Welcome to my stream where I cut a pizza LIVE for my friends!
+Welcome to my gameplay where I cut a pizza LIVE for my friends!
 
-           76 69 76 65  6C 61  70 69 7A 7A 61
+      76 69 76 65  6C 61  70 69 7A 7A 61
 
 
 

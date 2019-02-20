@@ -49,12 +49,122 @@ class KeyInput:
             elif next_char == 'q' or next_char == '\x03':
                 raise EOFError('End of input.')
 
+class ServePizza:
+
+    r_scale = 3
+    c_scale = 6
+
+    def initialize_pizza(self, unique_ingredients, ingredients_map):
+        # ingredients
+        self.pizza = np.full((self.r,self.c), ' ')
+        for ri in range(self.r):
+            for ci in range(self.c):
+                if (ri%self.r_scale==2 and \
+                    ci%self.c_scale==4):
+
+                    self.pizza[ri][ci] = unique_ingredients[ingredients_map
+                        [(ri-2)//self.r_scale]
+                        [(ci-4)//self.c_scale]]
+
+        # outline pizza
+        self.pizza[0:self.r:self.r-1, 1:self.c-1] = '-'
+        self.pizza[1:self.r-1,        0:self.c:self.c-1] = '|'
+        self.pizza[0:self.r:self.r-1, 0:self.c:self.c-1] = '+'
+
+    def find_slices(self, slices_map):
+        slices_dict = {}
+        for ri in range(len(slices_map)):
+            for ci in range(len(slices_map[0])):
+                slice_id = slices_map[ri][ci]
+
+                if slice_id in slices_dict:
+                    slices_dict[slice_id] = (*slices_dict[slice_id][:2],ri,ci)
+                elif slice_id != -1:
+                    slices_dict[slice_id] = (ri,ci,ri,ci)
+
+        return slices_dict.values()
+
+    def cut(self, slices):
+        for slice in slices:
+            r0,c0,r1,c1 = slice
+            self.pizza[
+                self.r_scale*r0+1: self.r_scale*(r1+1)+1: self.r_scale*(r1-r0+1)-1, # for top, bottom cuts
+                self.c_scale*c0+3: self.c_scale*(c1+1), # for every column int the slice
+                ] = '-'
+            self.pizza[
+                self.r_scale*r0+2: self.r_scale*(r1+1), # for every row in the slice
+                self.c_scale*c0+2: self.c_scale*(c1+1)+1: self.c_scale*(c1-c0+1)-2, # for left, right cuts
+                ] = '|'
+            for ri in range(self.r_scale*r0+2, self.r_scale*(r1+1)):
+                for ci in range(self.c_scale*c0+4, self.c_scale*(c1+1), 3):
+                    if self.pizza[ri,ci] == ' ':
+                        self.pizza[ri,ci] = '`'
+
+        for slice in slices:
+            r0,c0,r1,c1 = slice
+            self.pizza[
+                self.r_scale*r0+1: self.r_scale*(r1+1)+1: self.r_scale*(r1-r0+1)-1, # top, bottom rows
+                self.c_scale*c0+2: self.c_scale*(c1+1)+1: self.c_scale*(c1-c0+1)-2, # left, right columns
+                ] = '+'
+
+    def put_cursor_at(self, position):
+        r,c = position
+        self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '['
+        self.pizza[self.r_scale*r+2,self.c_scale*c+5] = ']'
+
+    def print_from(self, env):
+        unique_ingredients = env['information']['unique_ingredients']
+        ingredients_map = env['state']['ingredients_map']
+        slices_map = env['state']['slices_map']
+
+        r,c = len(ingredients_map),len(ingredients_map[0])
+        self.r, self.c = self.r_scale*r+2,self.c_scale*c+3
+
+        self.initialize_pizza(unique_ingredients, ingredients_map)
+
+        # cut slices
+        slices = self.find_slices(slices_map)
+        self.cut(slices)
+
+        # put cursor
+        self.put_cursor_at(env['state']['cursor_position'])
+
+        for line in self.pizza:
+            print('    {}'.format(''.join(line)))
+
 
 class Game:
+
+    legend = '\n' + \
+        '                                           +---------+\n' + \
+        '  Legend: T M - ingredients  [ ] - cursor  | T  `  M | - slice boundaries\n' + \
+        '                                           +---------+'
+
+    hello = '\n' + \
+        '             _)                                    |    |   _)               \n' + \
+        '       __ \   | _  / _  /   _` |       __|  |   |  __|  __|  |  __ \    _` | \n' + \
+        '       |   |  |   /    /   (   |      (     |   |  |    |    |  |   |  (   | \n' + \
+        '       .__/  _| ___| ___| \__,_|     \___| \__,_| \__| \__| _| _|  _| \__, | \n' + \
+        '      _|                                                              |___/  \n' + \
+        '\n' + \
+        '  |                 |                      _)                    |         |                \n' + \
+        '  __|  |   |   __|  __ \    _ \        __|  |  __ `__ \   |   |  |   _` |  __|   _ \    __| \n' + \
+        '  |    |   |  |     |   |  (   |     \__ \  |  |   |   |  |   |  |  (   |  |    (   |  |    \n' + \
+        ' \__| \__,_| _|    _.__/  \___/      ____/ _| _|  _|  _| \__,_| _| \__,_| \__| \___/  _|    \n' + \
+        '\n' + \
+        '\n' + \
+        '       Welcome to my gameplay where I cut a pizza LIVE for my friends!\n' + \
+        '\n' + \
+        '                   76 69 76 65  6C 61  70 69 7A 7A 61 \n' + \
+        '\n' + \
+        '\n'
+
+    goodbye = '\nBon appetit !'
 
     def __init__(self, args):
         self.max_steps = args.get('max_steps')
         self.env = None
+        self.serve_pizza = ServePizza()
 
     def init(self, pizza_config):
         self.google_engineer = GoogleEngineer(pizza_config)
@@ -92,6 +202,32 @@ class Game:
                 'score': self.google_engineer.score,
                 'slices': [slice.as_tuple for slice in slices]}}
         return self.env
+
+    def render_information(self):
+        print('  Rows:                             {}'.format(len(self.env['state']['ingredients_map'])))
+        print('  Columns:                          {}'.format(len(self.env['state']['ingredients_map'][0])))
+        print('  Min each ingredient per slice:    {}'.format(self.env['state']['min_each_ingredient_per_slice']))
+        print('  Max ingredients per slice:        {}'.format(self.env['state']['max_ingredients_per_slice']))
+        print('')
+        print('  Last action:                      {}'.format(self.env['information']['action']))
+        print('  Last reward:                      {}'.format(self.env['reward']))
+        print('')
+        print('  Cursor position:                  ({},{})'.format(*self.env['state']['cursor_position']))
+        print('  Slice mode:                       {}'.format('on' if self.env['state']['slice_mode'] else 'off'))
+        print('')
+        print('  Step:                             {}'.format(self.env['information']['step']))
+        print('  Score:                            {}'.format(self.env['information']['score']))
+        print('')
+        print('')
+
+
+    def render(self):
+        print(self.hello)
+        self.render_information()
+        self.serve_pizza.print_from(self.env)
+        print(self.legend)
+
+
 
 if __name__ == '__main__':
     pizza_config_line_description = \
@@ -168,6 +304,8 @@ if __name__ == '__main__':
     parser.add_argument('--name', default=None, help='folder where the states will be saved')
     parser.add_argument('--slices_path', default=None, help='store output slices to a file')
     parser.add_argument('--max_steps', type=int, default=100, help='maximum steps to do before quiting')
+    parser.add_argument('--quiet', action='store_true', help='disable output')
+    parser.add_argument('--render', action='store_true', help='render the pizza during playing')
     parser.add_argument('--wasd', action='store_true', help='instead of passing "right", "down", "left", ' + \
         '"up", "toggle" you can use wasd keys and spacebar for toggle; this will also print help messages')
     args = parser.parse_args()
@@ -175,30 +313,16 @@ if __name__ == '__main__':
     args_dict = args.__dict__
     slices_path = args_dict.get('slices_path')
     wasd = args_dict.get('wasd')
+    quiet = args_dict.get('quiet')
+    render = args_dict.get('render')
     name = args_dict.get('name')
     max_steps = args_dict.get('max_steps')
-
-    if wasd is not None and name is None:
-        raise Exception('Parameter --name must be provided for WASD mode')
 
     game_args = { 'max_steps': max_steps }
     game = Game(game_args)
 
-    if wasd:
-        hello = '\n' + \
-            '        _)                                    |    |   _)                               \n' + \
-            '  __ \   | _  / _  /   _` |       __|  |   |  __|  __|  |  __ \    _` |                 \n' + \
-            '  |   |  |   /    /   (   |      (     |   |  |    |    |  |   |  (   |                 \n' + \
-            '  .__/  _| ___| ___| \__,_|     \___| \__,_| \__| \__| _| _|  _| \__, |                 \n' + \
-            ' _|                                                              |___/                  \n' + \
-            '\n' + \
-            '\n' + \
-            '         Welcome, I cut a pizza here for my friends!\n' + \
-            '\n' + \
-            '             76 69 76 65  6C 61  70 69 7A 7A 61 \n' + \
-            '\n' + \
-            '\n'
-        print(hello)
+    if not quiet:
+        print(game.hello)
         print('\n Game rules:\n')
         print(game_rules)
         print()
@@ -209,7 +333,7 @@ if __name__ == '__main__':
             os.makedirs(name)
 
         # get pizza config
-        if wasd:
+        if not quiet:
             print('Input {}'.format(pizza_config_line_description))
             print('For example: 3 5 1 6')
             print()
@@ -220,7 +344,7 @@ if __name__ == '__main__':
         r, c, l, h = [int(n) for n in config_line.split(' ')]
 
         pizza_lines = []
-        if wasd:
+        if not quiet:
             print()
             print('Input:')
             print(pizza_lines_description)
@@ -240,15 +364,13 @@ if __name__ == '__main__':
 
         # init game
         env = game.init(pizza_config)
+        if render: game.render()
         if name is not None:
             env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
             with open(env_filename, 'w') as f:
                 json.dump(env, f, separators=(',',':'))
 
-        if wasd:
-            print('To get the display of the game, run in another terminal in the same directory:')
-            print('  python3 stream.py --refresh_delay=0.5 --name={}'.format(name))
-            print()
+        if not quiet:
             print('Now you can use WASD keys to move/increase and space bar for toggling slice mode. Press CTRL-C or q to exit.')
             print()
 
@@ -257,8 +379,8 @@ if __name__ == '__main__':
         while not env['done']:
             # get action
             action = action_input.next()
-            if wasd: print('Action: {}'.format(action))
             env = game.step(action)
+            if render: game.render()
             if name is not None:
                 env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
                 with open(env_filename, 'w') as f:
@@ -284,4 +406,4 @@ if __name__ == '__main__':
                     for slice in slices:
                         f.write('{} {} {} {}\n'.format(*slice))
 
-        if wasd: print('\nBon appetit !')
+        if not quiet: print(game.goodbye)
