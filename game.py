@@ -162,7 +162,7 @@ class Game:
     goodbye = '\nBon appetit !'
 
     def __init__(self, args):
-        self.max_steps = args.get('max_steps')
+        self.max_steps = args.get('max_steps', float('inf'))
         self.env = None
         self.serve_pizza = ServePizza()
 
