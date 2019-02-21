@@ -107,10 +107,10 @@ class ServePizza:
                 self.c_scale*c0+2: self.c_scale*(c1+1)+1: self.c_scale*(c1-c0+1)-2, # left, right columns
                 ] = '+'
 
-    def put_cursor_at(self, position):
+    def put_cursor_at(self, position, slice_mode):
         r,c = position
-        self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '['
-        self.pizza[self.r_scale*r+2,self.c_scale*c+5] = ']'
+        self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '<' if slice_mode else '['
+        self.pizza[self.r_scale*r+2,self.c_scale*c+5] = '>' if slice_mode else ']'
 
     def print_from(self, env):
         unique_ingredients = env['information']['unique_ingredients']
@@ -127,7 +127,7 @@ class ServePizza:
         self.cut(slices)
 
         # put cursor
-        self.put_cursor_at(env['state']['cursor_position'])
+        self.put_cursor_at(env['state']['cursor_position'], env['state']['slice_mode'])
 
         for line in self.pizza:
             print('    {}'.format(''.join(line)))
