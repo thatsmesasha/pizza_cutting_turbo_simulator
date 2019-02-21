@@ -363,12 +363,12 @@ if __name__ == '__main__':
         pizza_config = { 'pizza_lines': pizza_lines, 'r': r, 'c': c, 'l': l, 'h': h }
 
         # init game
-        env = game.init(pizza_config)
+        game.init(pizza_config)
         if render: game.render()
         if name is not None:
-            env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
+            env_filename = os.path.join(name, '{}_env.json'.format(game.env['information']['step']))
             with open(env_filename, 'w') as f:
-                json.dump(env, f, separators=(',',':'))
+                json.dump(game.env, f, separators=(',',':'))
 
         if not quiet:
             print('Now you can use WASD keys to move/increase and space bar for toggling slice mode. Press CTRL-C or q to exit.')
@@ -376,15 +376,15 @@ if __name__ == '__main__':
 
         # run game
         action_input = KeyInput() if wasd else StandardInput()
-        while not env['done']:
+        while not game.env['done']:
             # get action
             action = action_input.next()
-            env = game.step(action)
+            game.step(action)
             if render: game.render()
             if name is not None:
-                env_filename = os.path.join(name, '{}_env.json'.format(env['information']['step']))
+                env_filename = os.path.join(name, '{}_env.json'.format(game.env['information']['step']))
                 with open(env_filename, 'w') as f:
-                    json.dump(env, f, separators=(',',':'))
+                    json.dump(game.env, f, separators=(',',':'))
 
 
 
