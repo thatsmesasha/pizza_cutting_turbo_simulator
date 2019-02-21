@@ -289,7 +289,7 @@ if __name__ == '__main__':
         ' indicate the end of the game.\n' + \
         ' Note that the files will be overwritten if exist.\n' + \
         '\n' + \
-        ' If output parameter is provided, there will be a file that consists of:\n' + \
+        ' If --output parameter is provided, there will be a file that consists of:\n' + \
         '   - 1 line containing a single natural number S (0 <= S <= R * C),\n' + \
         '     representing the total number of slices to be cut.\n' + \
         '   - S lines describing the slices. Each of these lines contain\n' + \
@@ -302,7 +302,7 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--name', default=None, help='folder where the states will be saved')
-    parser.add_argument('--slices_path', default=None, help='store output slices to a file')
+    parser.add_argument('--output', default=None, help='a path where to store final slices')
     parser.add_argument('--max_steps', type=int, default=100, help='maximum steps to do before quiting')
     parser.add_argument('--quiet', action='store_true', help='disable output')
     parser.add_argument('--render', action='store_true', help='render the pizza during playing')
@@ -311,7 +311,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     args_dict = args.__dict__
-    slices_path = args_dict.get('slices_path')
+    output = args_dict.get('output')
     wasd = args_dict.get('wasd')
     quiet = args_dict.get('quiet')
     render = args_dict.get('render')
@@ -399,8 +399,8 @@ if __name__ == '__main__':
                     json.dump(game.env, f, separators=(',',':'))
 
             # save slices
-            if slices_path:
-                with open(slices_path, 'w') as f:
+            if output:
+                with open(output, 'w') as f:
                     slices = game.env['information']['slices']
                     f.write('{}\n'.format(len(slices)))
                     for slice in slices:
