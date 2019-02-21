@@ -182,7 +182,7 @@ class Game:
                 'unique_ingredients': self.unique_ingredients,
                 'score': 0,
                 'slices': []}}
-        return self.env
+        return self.env['state'], self.env['reward'], self.env['done'], self.env['information']
 
 
     def step(self, action):
@@ -201,7 +201,7 @@ class Game:
                 'unique_ingredients': self.unique_ingredients,
                 'score': self.google_engineer.score,
                 'slices': [slice.as_tuple for slice in slices]}}
-        return self.env
+        return self.env['state'], self.env['reward'], self.env['done'], self.env['information']
 
     def render_information(self):
         print('  Rows:                             {}'.format(len(self.env['state']['ingredients_map'])))
