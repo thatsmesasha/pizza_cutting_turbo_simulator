@@ -1,4 +1,4 @@
-from ingredients import Ingredients
+from src.ingredients import Ingredients
 
 import numpy as np
 from enum import Enum

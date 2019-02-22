@@ -32,7 +32,7 @@ renders the game and saves states to the files if specified.
 More description on the game rules and parameters:
 
 ```
-python3 game.py --help
+python3 -m src.game --help
 ```
 
 #### Example
@@ -40,7 +40,7 @@ python3 game.py --help
 To play a game with a keyboard, run in a terminal:
 
 ```
-python3 game.py --wasd --render
+python3 -m src.game --wasd --render
 ```
 
 Sample output of the stream:

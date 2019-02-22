@@ -1,5 +1,5 @@
-from google_engineer import GoogleEngineer
-from pizza import Pizza
+from src.google_engineer import GoogleEngineer
+from src.pizza import Pizza
 
 import numpy as np
 import json

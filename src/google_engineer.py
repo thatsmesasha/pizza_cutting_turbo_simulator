@@ -1,4 +1,4 @@
-from pizza import Pizza, Direction
+from src.pizza import Pizza, Direction
 
 import numpy as np
 import json
