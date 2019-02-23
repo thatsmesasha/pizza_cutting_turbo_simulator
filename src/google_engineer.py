@@ -6,6 +6,7 @@ import json
 POSITIVE_REWARD = 1.0
 NEUTRAL_REWARD  = 0.0
 NEGATIVE_REWARD = -0.1
+LAZINESS_REWARD = -0.01
 
 class ActionNotFoundException(Exception):
     pass
@@ -17,6 +18,7 @@ class GoogleEngineer:
         self.max_ingredients_per_slice = pizza_config['h']
         self.cursor_position = (0,0)
         self.valid_slices = []
+        self.last_action = None
         self.score = 0
 
     def score_of(self, slice):
@@ -45,15 +47,20 @@ class GoogleEngineer:
         if action == 'next':
             ri, ci = self.cursor_position
             self.cursor_position = (ri,ci+1) if ci+1 < self.pizza.c else (ri+1,0)
-            return NEUTRAL_REWARD
+            reward = NEUTRAL_REWARD
+        else:
+            reward = self.increase(Direction[action])
 
-        reward = self.increase(Direction[action])
+        if self.last_action != action:
+            reward += LAZINESS_REWARD
+        self.last_action = action
         return reward
 
     def state(self):
         return {
             'ingredients_map': self.pizza.ingredients._map.tolist(),
             'slices_map': self.pizza._map.tolist(),
+            'last_action': self.last_action or 'next',
             'cursor_position': self.cursor_position,
             'min_each_ingredient_per_slice': self.min_each_ingredient_per_slice,
             'max_ingredients_per_slice': self.max_ingredients_per_slice,
