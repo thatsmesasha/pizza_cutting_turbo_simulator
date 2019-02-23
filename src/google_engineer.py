@@ -3,6 +3,10 @@ from src.pizza import Pizza, Direction
 import numpy as np
 import json
 
+POSITIVE_REWARD = 1.0
+NEUTRAL_REWARD  = 0.0
+NEGATIVE_REWARD = -0.1
+
 class ActionNotFoundException(Exception):
     pass
 
@@ -34,7 +38,8 @@ class GoogleEngineer:
             next_cursor_position[1] >= 0 and next_cursor_position[1] < self.pizza.c):
 
             self.cursor_position = next_cursor_position
-        return 0
+            return NEUTRAL_REWARD
+        return NEGATIVE_REWARD
 
     def increase(self, direction):
         slice = self.pizza.slice_at(self.cursor_position)
@@ -47,13 +52,13 @@ class GoogleEngineer:
             self.valid_slices.append(new_slice)
             score = self.score_of(new_slice) - self.score_of(slice)
             self.score += score
-            return score
-        return 0
+            return score * POSITIVE_REWARD
+        return NEUTRAL_REWARD if new_slice is not None else NEGATIVE_REWARD
 
     def do(self, action):
         if action == 'toggle':
             self.slice_mode = not self.slice_mode
-            return 0
+            return NEUTRAL_REWARD
 
         if action not in Direction.__members__:
             raise ActionNotFoundException('Action \'{}\' is not recognised.'.format(action))
