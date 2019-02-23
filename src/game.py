@@ -105,10 +105,10 @@ class ServePizza:
                 self.c_scale*c0+2: self.c_scale*(c1+1)+1: self.c_scale*(c1-c0+1)-2, # left, right columns
                 ] = '+'
 
-    def put_cursor_at(self, position, slice_mode):
+    def put_cursor_at(self, position):
         r,c = position
-        self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '<' if slice_mode else '['
-        self.pizza[self.r_scale*r+2,self.c_scale*c+5] = '>' if slice_mode else ']'
+        self.pizza[self.r_scale*r+2,self.c_scale*c+3] = '['
+        self.pizza[self.r_scale*r+2,self.c_scale*c+5] = ']'
 
     def print_from(self, env):
         unique_ingredients = env['information']['unique_ingredients']
@@ -125,7 +125,7 @@ class ServePizza:
         self.cut(slices)
 
         # put cursor
-        self.put_cursor_at(env['state']['cursor_position'], env['state']['slice_mode'])
+        self.put_cursor_at(env['state']['cursor_position'])
 
         for line in self.pizza:
             print('    {}'.format(''.join(line)))
@@ -211,7 +211,6 @@ class Game:
         print('  Last reward:                      {}'.format(self.env['reward']))
         print('')
         print('  Cursor position:                  ({},{})'.format(*self.env['state']['cursor_position']))
-        print('  Slice mode:                       {}'.format('on' if self.env['state']['slice_mode'] else 'off'))
         print('')
         print('  Step:                             {}'.format(self.env['information']['step']))
         print('  Score:                            {}'.format(self.env['information']['score']))
@@ -264,12 +263,9 @@ if __name__ == '__main__':
         '\n' + \
         ' - ' + pizza_lines_description + \
         '\n' + \
-        ' For input type one of "right", "down", "left", "up" to move/increase in specific direction \n' + \
-        ' and "toggle" for toggling slice mode. Input will be read line by line.\n' + \
+        ' For input type one of "right", "down" to increase slice in the specific direction \n' + \
+        ' and "next" for going to the next position. Input will be read line by line.\n' + \
         ' You can overwrite how you pass the input with parameter --wasd (check its help).\n' + \
-        ' When the slice mode is on, passing directions actions will increase the slice\n' + \
-        ' at the position of the cursor. Otherwise, the cursor will move in the specified\n' + \
-        ' direction.\n' + \
         '\n' + \
         ' Before each action there will be a file "<name>/<step_index>_env.json"\n' + \
         ' containing state, reward, game over and other information. If <name> parameter\n' + \

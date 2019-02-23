@@ -16,7 +16,6 @@ class GoogleEngineer:
         self.min_each_ingredient_per_slice = pizza_config['l']
         self.max_ingredients_per_slice = pizza_config['h']
         self.cursor_position = (0,0)
-        self.slice_mode = False
         self.valid_slices = []
         self.score = 0
 
@@ -56,7 +55,6 @@ class GoogleEngineer:
             'ingredients_map': self.pizza.ingredients._map.tolist(),
             'slices_map': self.pizza._map.tolist(),
             'cursor_position': self.cursor_position,
-            'slice_mode': self.slice_mode,
             'min_each_ingredient_per_slice': self.min_each_ingredient_per_slice,
             'max_ingredients_per_slice': self.max_ingredients_per_slice,
         }
