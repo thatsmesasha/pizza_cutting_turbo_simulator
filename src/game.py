@@ -11,11 +11,9 @@ class StandardInput:
 
 class KeyInput:
     key_to_action = {
-        'w': 'up',
-        'a': 'left',
         's': 'down',
         'd': 'right',
-        ' ': 'toggle',
+        ' ': 'next',
     }
 
     def __init__(self):
@@ -44,7 +42,7 @@ class KeyInput:
     def next(self):
         while True:
             next_char = self.next_char().lower()
-            if next_char in 'wasd ':
+            if next_char in 'sd ':
                 return self.key_to_action[next_char]
             elif next_char == 'q' or next_char == '\x03':
                 raise EOFError('End of input.')
@@ -188,7 +186,7 @@ class Game:
     def step(self, action):
         self.step_index += 1
         reward = self.google_engineer.do(action)
-        done = not self.google_engineer.pizza.can_increase_more() or self.step_index >= self.max_steps
+        done = self.google_engineer.is_done() or self.step_index == self.max_steps
         slices = sorted(self.google_engineer.valid_slices, key=lambda s: s.as_tuple)
 
         self.env = {
