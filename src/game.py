@@ -60,8 +60,8 @@ def step(RCLH, state, position, shape):
 
     return state, reward, None
 
-def display(state, position=None, reward=None):
-    display_format = \
+def render(state, position=None, reward=None):
+    render_format = \
         'State:\n' + \
         '- ingredients_map:\n' + \
         '{}\n' + \
@@ -72,7 +72,7 @@ def display(state, position=None, reward=None):
         '- position_map:\n' + \
         '{}\n'
 
-    print(display_format.format(*state))
+    print(render_format.format(*state))
     if position: print('Position: {}'.format(position))
     if reward: print('Reward: {}'.format(reward))
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
         # start game
         state, position = init(RCLH, pizza_map)
-        display(state, position=position)
+        render(state, position=position)
 
         # decide on slice shape
         shape_id = np.random.randint(0,len(possible_shapes))
@@ -113,8 +113,8 @@ if __name__ == '__main__':
         print('Cutting slice with shape {}'.format(shape))
         state, reward, debug_message = step(RCLH, state, position, shape)
         if debug_message: print('Couldn\'t cut slice: {}'.format(debug_message))
-        display(state,position=position,reward=reward)
+        render(state,position=position,reward=reward)
 
         # go to the next position
         state, position, done = move_next(state, position)
-        display(state, position=position)
+        render(state, position=position)
